@@ -15,7 +15,7 @@
 
 视图控制器最重要的角色是管理视图的层次结构。每个视图控制器有一个包裹所有视图控制器内容的根视图。对于那个根视图，你添加你需要的一些视图来显示你的内容。图1-1说明了视图控制器和它的视图直接的内键关系。视图控制器总有它的根视图的应用并且每个视图有它的子视图们的强引用。
 
-![image-20180411124547470](/var/folders/y7/l0s2ppqn0yqf_s407sv57wmm0000gn/T/abnerworks.Typora/image-20180411124547470.png)
+![VCPG_ContainerViewController_fig_1-2_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_ContainerViewController_fig_1-2_2x.png)
 
 > ##### 注意
 >
@@ -23,5 +23,26 @@
 
 内容视图控制器自己管理它所有的视图。容器视图控制器管理它自己的视图外加上它的子视图控制器的根视图。容器视图控制器不管理它的子视图控制器的内容。它只管理根视图，根据容器的设计来调整它的大小并放置它。图1-2说明了拆分视图控制器（split view controller）和它的子视图控制器之间的关系。拆分视图控制器管理它的子视图总体的大小和位置，但是子视图控制器管理这些视图的实际内容。
 
-![image-20180411130238477](/var/folders/y7/l0s2ppqn0yqf_s407sv57wmm0000gn/T/abnerworks.Typora/image-20180411130238477.png)
+![VCPG_ControllerHierarchy_fig_1-1_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_ControllerHierarchy_fig_1-1_2x.png)
 
+关于管理视图控制器的视图的信息，查看Managing View Layout
+
+###### 数据整编（Data Marshaling）
+
+视图控制器在它管理的视图和应用的数据之间扮演一个中间者角色。UIViewController 类的方法和属性让你管理应用的视觉呈现。在你创建 UIViewController 子类时，在你的子类里添加任何你需要的变量来管理你的数据。在视图控制器有数据和用于展示哪些数据的视图的引用的地方，添加自定义变量创建一种像图1-3里的关系。在数据和视图之间移动数据是你的职责。
+
+![VCPG_CustomSubclasses_fig_1-3_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_CustomSubclasses_fig_1-3_2x.png)
+
+你总应该在你的视图控制器和数据对象内维持干净的职责分离。确保数据结构完整的大多数逻辑属于数据对象自己。视图控制器可以验证来自视图的输入，然后用你的数据对象要求的格式来打包那些输入，但是你应该最小化视图控制器在管理实际数据的角色。UIDocument 对象是一种从视图控制器单独管理数据的一种方式。文档对象（document object）是一个知道如何读取、写入数据到持久化存储的控制器对象。在你创建它的子类时，添加任何你需要的逻辑和方法来获取那些数据并把它传入视图控制器或应用的其他部分。视图控制器可以存储任何它收到的数据的副本来使更新视图更容易，但是文档任然拥有真实数据。
+
+###### 用户交互
+
+视图控制器是响应者对象（responder objects），有处理响应者链下发的事件的可能。尽管他们能这样做，但是视图控制器几乎不直接处理触摸事件。相反，视图通常处理自己的触摸事件并报告结果给一个关联的代理或目标对象的一个方法，它通常是视图控制器。所以视图控制器里的大多数事件被使用代理方法或动作方法处理。
+
+关于在视图控制器里实现动作方法的更多信息，查看处理用户交互。关于处理其他事件类型的信息，查看iOS事件处理指南（Event Handling Guide for iOS）
+
+###### 资源管理
+
+视图控制器为它的视图们和它创建的所有对象承担全部职责。UIViewController 类自动处理大部分视图管理。例如，UIKit 自动释放任何不再被需要的视图相关的资源。在 UIViewController 子类里，你有责任管理任何你创建的对象。在可用的空闲内存低时，UIKit 请求应用释放任何它们不再需要的资源。它做这个的一种方式时通过调用视图控制器的 didReceiveMemoryWarning 方法。使用这个方法来移除不再需要或稍后易于重新创建的对象的引用。例如，你可以使用这个方法来移除缓存数据。在低内存条件触发时，释放尽可能多的内存很重要。耗用太多内存的应用肯能被系统完全终止来恢复内存。
+
+###### 适应性
