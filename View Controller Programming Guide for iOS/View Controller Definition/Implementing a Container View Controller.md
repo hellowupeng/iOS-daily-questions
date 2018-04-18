@@ -84,7 +84,28 @@ UINavigationController对象支持通过一个层级数据集导航。一个导�
 }
 ```
 
+在前面的例子里，注意你只调用子视图控制器的`didMoveToParentViewcontroller:`方法。那是因为`addChildViewController:`方法为你调用了子视图控制器的`willMoveToParentViewController:`方法。你必须自己调用`didMoveToParentViewController:`方法的原因是这个方法不能被调用直到在你嵌入子视图控制器的视图到你的容器视图控制器的视图层次结构里后。在使用自动布局时，在添加子视图控制器到容器的视图层次结构后在容器和子视图控制器之间设置约束。你的约束应该只影响子视图控制器的根视图的大小和位置。不要在子视图控制器的视图层次结构里更改根视图和任何其他视图的内容。
+
 **移除子视图控制器**
+
+为了从内容移除子视图控制器，通过做以下事情来在视图控制器之间移除父-子关系。
+
+1. 以值nil调用子视图控制器的`willMoveToParentViewController:`方法。
+2. 移除任何你配置的子视图控制器的根视图的约束。
+3. 从容器的视图层次结构移除子视图控制器的根视图。
+4. 调用子视图控制器的`removeFromParentViewController`方法来最后确定父子关系的结束。
+
+移除子视图控制器永久地中断父-子间的关系。移除子视图控制器只在你不再需要引用它时。例如，导航控制器在一个新的视图控制器被推入到导航栈时不移除它当前的子视图控制器们。它只在它们被弹出栈时移除它们。
+
+清单5-2向你展示了如何从它的容器移除子视图控制器。以值nil调用`willMoveToParentViewController:`方法给子视图控制器一个机会来为改变做准备。`removeFromParentViewController`方法也调用子视图控制器的`didMoveToParentViewController:`方法，传入那个方法一个nil值。设置父视图控制器为nil从你的容器最后确定子视图控制器的移除。
+
+```objective-c
+- (void)hideContentController: (UIViewController *)content {
+    [content willMoveToParentViewController: nil];
+    [content.view removeFromSuperView];
+    [content removeFromParentViewController];
+}
+```
 
 **在子视图控制器之间过渡**
 
