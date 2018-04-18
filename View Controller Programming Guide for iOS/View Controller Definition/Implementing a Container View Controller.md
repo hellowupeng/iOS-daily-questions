@@ -57,6 +57,33 @@ UINavigationController对象支持通过一个层级数据集导航。一个导�
 
 **添加子视图控制器到内容**
 
+为了通过编程合并子视图控制器到你的内容，通过做以下事情来在有关的视图控制器之间创建一种父-子关系。
+
+1. 调用容器视图控制器的`addChildViewController:`方法。
+
+   这个方法告诉UIKit你的容器视图控制器现在管理子视图控制器的视图。
+
+2. 添加子视图控制器的根视图到容器的视图层次结构。
+
+   总是记住设置子视图的frame的大小和位置作为这个过程的一部分。
+
+3. 为管理子视图控制器的根视图大小和位置添加约束。
+
+4. 调用子视图控制器的`didMoveToParentViewController:`方法。
+
+清单5-1展示了一个容器如何在它的容器里嵌入一个子视图控制器。在建立父-子关系后，容器容器设置子视图的frame并添加子视图控制器的视图到它自己的视图层次结构。
+
+设置子视图控制器的视图的frame size是重要的并且确保视图在容器里正确地显示。在添加视图后，容器调用子视图控制器的`didMoveToParentViewController:`方法来给子视图控制器一个机会响应视图所有权的改变。
+
+```objective-c
+- (void)displayContentController: (UIViewController *)content {
+    [self addChildViewController: content];
+    content.view.frame = [self frameForContentController];
+    [self.view addSubview: self.currentClientView];
+    [content didMoveToParentViewController: self];
+}
+```
+
 **移除子视图控制器**
 
 **在子视图控制器之间过渡**
