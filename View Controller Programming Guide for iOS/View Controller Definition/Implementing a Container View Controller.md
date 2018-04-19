@@ -109,8 +109,72 @@ UINavigationController对象支持通过一个层级数据集导航。一个导�
 
 **在子视图控制器之间过渡**
 
-**为子视图控制器们管理外观更新**
+在你想要动画一个子视图控制器用另一个接替时，合并子视图控制器的增加和移除到过渡动画过程。在动画之前，确保两个子视图控制器是内容的一部分但是让当前的子视图控制器知道它将要离开。在动画期间，移动新的子视图控制器的视图到位置并移除老的子视图控制器视图。在动画结束时，完成子视图控制器的移除。
+
+清单5-3展示了一个用一个过渡动画用另一个交换子视图控制器的示例。在这个例子里，新的视图控制器被动画到被移动到屏幕外的存在的子视图控制器当前占用的矩形区域。在动画结束后，完成块从容器移除子视图控制器。在这个例子里，`transitionFromViewController:toViewController:duration:options:completion:`方法自动更新容器的视图层次结构，所以你不需要自己添加和移除视图。
+
+```objective-c
+- (void)cycleFromViewController: (UIViewController *)oldVC toViewController: (UIViewController *)newVC {
+    [oldVC willMoveToParentViewController:nil];
+    [self addChildViewController:newVC];
+    
+    newVC.view.frame = [self newViewStartFrame];
+    CGRect endFrame = [self oldViewEndFrame];
+    
+    [self transitionFromViewController:oldVC toViewController:newVC duration:0.25 options:0 animations: ^{
+        newVC.view.frame = oldVC.view.frame;
+        oldVC.view.frame = endFrame;
+    }
+     completion:^(BOOL finished) {
+         [oldVC removeFromParentViewController];
+         [newVC didMoveToParentViewController:self];
+     }];
+}
+```
+
+**为子视图控制器们管理Appearance更新**
+
+在添加子视图控制器到容器后，容器自动转发外观相关的消息给子视图控制器。这通常是你想要的行为，因为他确保了所有事件被正确地发送。然而，有时候默认的行为可能用一种对你的容器不合理的顺序发送这些事件。例如，如果多个子视图控制器同时改变它们的视图状态，你可能想要合并这些改变以便外观回调用一种更合理的顺序同时发生。
+
+为了接管appearance回调的职责，在容器视图控制器里覆盖`shouldAutomaticallyForwardAppearanceMethods`方法并返回NO，如清单5-4所示。返回NO让UIKit知道你的容器视图控制器通知外观改变的子视图控制器们。
+
+```objective-c
+- (BOOL)shouldAutomaticallyForwardAppearanceMethods {
+    return NO;
+}
+```
+
+在一个appearance过渡发生时，合适的调用子视图控制器的`beginAppearanceTransition:animated:`或`endAppearanceTransition`方法。例如，如果容器有一个由一个`child`属性引用的单一子视图控制器，如清单5-5所示，容器会转发这些消息到子视图控制器。
+
+```objective-c
+- (void)viewWillAppear:(BOOL)animated {
+    [self.child beginAppearanceTransition: YES animated: animted];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [self.child endAppearanceTransition];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [self.child beginAppearanceTransition: NO animated: animated];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [self.child endAppearanceTransition];
+}
+```
 
 ###### 构建一个容器视图控制器的建议
 
+设计、开发、测试一个新的容器视图控制器需要时间。尽管单个行为是简单的，但是控制器作为一整个会相当复杂。在实现容器类时考虑以下技巧。
+
+- 只访问子视图控制器的根视图。容器只应该访问每个子视图控制器的根视图，那就是说，由子视图控制器的view属性返回的视图。它绝不应该访问子视图控制器的任何其他视图。
+- 子视图控制器应该对它们的容器有最少的了解。子视图控制器应该专注它自己的内容。如果容器允许它的行为被子视图控制器影响，它应该使用代理设计模式来管理这些交互。
+- 首先使用正常的视图设计容器。使用正常的视图（而不是来自子视图控制器的视图）给你机会在一个简化的环境里测试布局约束和动画过渡。在正常的视图如期工作时，用子视图控制器的视图交换它们。
+
 ###### 委托控制给子视图控制器
+
+容器视图控制器可以委托它自己的appearance的某部分给它的子视图控制器。你可以用以下方式来委托控制：
+
+- 让子视图控制器决定状态栏样式。为了委托状态栏appearance给子视图控制器，在容器视图控制器里覆盖`childViewControllerForStatusBarStyle`和`childViewControllerForStatusBarHidden`方法。
+- 让子视图控制器指定它自己的偏好尺寸。拥有灵活布局的容器可以使用子视图控制器自己的`preferredContentSize`属性来帮助决定子视图控制器的大小。
