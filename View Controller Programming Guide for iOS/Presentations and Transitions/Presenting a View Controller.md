@@ -34,9 +34,21 @@
 
 ![VCPG_popover-style_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_popover-style_2x.png)
 
+由于popovers在水平紧凑环境里采用全屏展示，你通常需要修改你的popover来处理这种适应。在全屏模式里，你需要一种清除被展示的popover的方式。你可以通过在可取消的容器视图控制器里添加一个按钮，嵌入popover来这样做，或者改变它自己的适应行为。
 
+关于如何配置popover展示的技巧，查看Presenting a View Controller in a Popover。
 
 **当前上下文样式**
+
+`UIModalPresentationCurrentContext`样式在你的界面里覆盖一个指定的视图控制器。在使用与环境相关的样式时，你通过设置它的`definesPresentationContext`属性为YES来指定你想要覆盖的视图控制器。图8-3说明了只覆盖拆分视图控制器的一个子视图控制器的current context presentation。
+
+![VCPG_CurrentContextStyles_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_CurrentContextStyles_2x.png)
+
+> ###### 注意
+>
+> 在使用`UIModalPresentationFullScreen`样式呈现一个视图控制器时，UIKit通常在过渡动画结束后移除底部视图控制器的视图。你可以通过指定UIModalPresentationOverCurrentContext样式作为替代来阻止这些视图的移除。你可以在被展示的视图控制器有让底部内容显示的透明区域时使用那个样式。
+
+定义展示上下文的视图控制器也能在展示期间定义过渡动画来使用。
 
 **自定义展示样式**
 
