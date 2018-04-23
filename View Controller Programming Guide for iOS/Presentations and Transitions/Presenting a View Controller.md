@@ -12,9 +12,29 @@
 
 **展示样式**
 
+视图控制器的展示样式决定它在屏幕上的外观。UIKit定义了许多标准的展示样式，每个伴随特定的外观和意图。你也可以定义你自己的自定义展示样式。在设计应用时，为你正在尝试做的什么选择最有意义的展示样式，分配合适的常量到你想要呈现的视图控制器的`modalPresentationStyle`属性。
+
 **全屏展示样式**
 
+全屏展示样式覆盖整个屏幕，阻止与潜在内容的交互。在一个水平正常的环境里，只有一个全屏样式完全地覆盖底部内容。剩余部分纳入模糊或透明化视图来允许底部视图控制器的一部分持续显示。在水平紧凑环境里，全屏展示自动地采用`UIModalPresentationFullScreen`样式并覆盖所有底部内容。
+
+图8-1说明了在水平正常环境里使用`UIModalPresentationFullScreen`，`UIModalPresentationPageSheet`和`UIModalPresentationFormSheet`样式的展示的外观。图中，左上方绿色的视图控制器呈现右上方蓝色的视图控制器，每个展示样式的结果在下面显示。对于一些展示样式，UIKit在两个视图控制器内容之间插入一个模糊视图。
+
+![VCPG_PresentationStyles _fig_8-1_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_PresentationStyles _fig_8-1_2x.png)
+
+> ###### 注意
+>
+> 在使用UIModalPresentationFullScreen样式呈现视图控制器时，UIKit通常在过渡动画完成后移除底部视图控制器的视图。你可以通过指定UIModalPresentationOverFullScreen样式作为替代来阻止这些视图的移除。你可以在被呈现视图控制器有让底部内容显示的透明区域时使用那个样式。
+
+在使用全屏展示样式时，初始化展示的视图控制器自己必须覆盖整个屏幕。如果展示视图控制器没有覆盖屏幕，UIKit遍历视图控制器层次结构直到它找到覆盖屏幕的一个视图控制器。如果他不能找到一个充满屏幕的中间视图控制器，UIKit使用窗口的根视图控制器。
+
 **Popover样式**
+
+`UIModalPresentationPopover`样式使用一个popover视图显示视图控制器。Popovers对于显示有关关注或选中对象的额外信息或条目列表是有用的。在水平正常的环境里，popover视图只覆盖部分屏幕，如图8-2所示。在水平紧凑环境里，popovers默认采用UIModalPresentationOverFullScreen展示样式。在popover视图外的点击自动清除popover。
+
+![VCPG_popover-style_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_popover-style_2x.png)
+
+
 
 **当前上下文样式**
 
