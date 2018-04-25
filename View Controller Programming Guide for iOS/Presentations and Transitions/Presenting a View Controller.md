@@ -48,13 +48,29 @@
 >
 > 在使用`UIModalPresentationFullScreen`样式呈现一个视图控制器时，UIKit通常在过渡动画结束后移除底部视图控制器的视图。你可以通过指定UIModalPresentationOverCurrentContext样式作为替代来阻止这些视图的移除。你可以在被展示的视图控制器有让底部内容显示的透明区域时使用那个样式。
 
-定义展示上下文的视图控制器也能在展示期间定义过渡动画来使用。
+定义展示上下文的视图控制器也能在展示期间定义过渡动画来使用。通常，UIKit使用被展示的视图控制器的modalTransitionStyle属性的值使屏幕上的视图控制器充满生气。如果展示context视图控制器让它的providesPresentationContextTransitionStyle设置为YES，UIKit使用那个视图控制器的modalTransitionStyle属性的值作为替代。
+
+在过渡到水平紧凑环境时，当前context样式采用`UIModalPresentationFullScreen`样式。为了改变那个行为，使用一个自适应展示委托来指定不同的展示样式或视图控制器。
 
 **自定义展示样式**
 
+`UIModalPresentationCustom`样式让你使用一个你定义的自定义样式来展示视图控制器。创建自定义样式涉及创建UIPresentationController子类并使用它的方法使任何自定义视图有生气的到屏幕上并设置被展示的视图控制器的尺寸和位置。展示控制器也处理由于被展示视图控制器的特点改变发生的任何适应。
+
+如何定义自定义展示控制器的信息，查看Creating Custom Presentations。
+
 **过渡样式**
 
-**呈现于显示视图控制器**
+过渡样式决定用于显示被展示视图控制器的动画类型。对于内建过渡样式，你分配一个标准的过渡样式到你想要呈现的视图控制器的`modalTransitionStyle`属性。在你呈现视图控制器时，UIKit创建响应那个样式的动画。例如，图8-4说明了标准的向上滑动过渡（`UIModalTransitionStyleCoverVertical`）如何在使屏幕上动画展示视图控制器。视图控制器B在屏幕外开始并动画展示到视图控制器A上面。在视图控制器B被清除时，动画向相反情况以便B滑落展现A。
+
+![VCPG_SlideTransition_fig_8-1_2x](/Users/andywu/Documents/iOS-daily-questions/View Controller Programming Guide for iOS/images/VCPG_SlideTransition_fig_8-1_2x.png)
+
+你可以使用一个动画制造者对象和过渡代理来创建自定义过渡。动画制造者对象为安置屏幕上的视图控制器创建过渡动画。过渡代理在合适时间提供那个动画制造者对象到UIKit。关于如何实现自定义过渡的信息，查看Customizing the Transition Animations。
+
+**呈现与显示视图控制器**
+
+UIViewController类提供两种方式来显示视图控制器：
+
+- showViewController:sender:和showDetailViewController:sender:方法提供了最具适应性和灵活的方式来显示视图控制器。
 
 ###### 呈现视图控制器
 
